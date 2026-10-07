@@ -1,0 +1,9 @@
+1. dar que el cuestionario tenga funcionalidad a la hora de los juegos de matemáticas y mas juegos que iran agregando,DEPENDIENDO EL NIVEL EDUCATIVO
+2.ver como usar la api de Gemini AI pPARA EL CHAT
+3.hacer que los recordatorios de salud los puedan aplicar los usuarios
+4.pensar mas juego y implementarlos
+5.agregar mas logros
+6.agregar una zona con material de estudio cargado y disponibilidad de que el usuario pueda cargarlo y eso va a depender del cuestionario de edad,nombre,nivel educativo
+
+
+FECHA 30 DE JUNIO

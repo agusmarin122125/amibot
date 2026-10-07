@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AmigoBot - Tu Amigo Virtual</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 100px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .card h3 {
+            color: #5a67d8;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-icon {
+            font-size: 2rem;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .game-area {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .notebook {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .notebook-page {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 10px 0;
+            border-left: 5px solid #5a67d8;
+        }
+
+        .notebook textarea {
+            width: 100%;
+            height: 200px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .achievements {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .achievement {
+            background: linear-gradient(45deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        /* Chat Bot Styles */
+        .chat-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .chat-bubble {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        .chat-bubble:hover {
+            transform: scale(1.1);
+        }
+
+        .chat-bubble::before {
+            content: "🤖";
+            font-size: 24px;
+        }
+
+        .chat-window {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .bot-message {
+            background: #f0f0f0;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+
+        .user-message {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .chat-send {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .math-game {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .math-question {
+            font-size: 2rem;
+            margin: 20px 0;
+            color: #5a67d8;
+        }
+
+        .math-input {
+            padding: 15px;
+            font-size: 1.5rem;
+            border: 3px solid #e2e8f0;
+            border-radius: 15px;
+            width: 150px;
+            text-align: center;
+            margin: 0 10px;
+        }
+
+        .memory-game {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+
+        .memory-card {
+            aspect-ratio: 1;
+            background: linear-gradient(45deg, #ffd89b 0%, #19547b 100%);
+            border: none;
+            border-radius: 15px;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .memory-card:hover {
+            transform: scale(1.05);
+        }
+
+        .memory-card.flipped {
+            background: white;
+            border: 3px solid #5a67d8;
+        }
+
+        .story-area {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .story-text {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+            50% { box-shadow: 0 5px 30px rgba(102, 126, 234, 0.4); }
+            100% { box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .chat-window {
+                width: 300px;
+                height: 400px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AmigoBot</h1>
+            <p>Tu amigo virtual que te acompaña, te enseña y te divierte</p>
+        </div>
+
+        <div class="main-content">
+            <div class="card">
+                <h3><span class="card-icon">🎮</span>Juegos Divertidos</h3>
+                <p>Aprende jugando con matemáticas, memoria y muchos juegos más. ¡Vamos a divertirnos!</p>
+                <button class="btn" onclick="showGames()">Jugar Ahora</button>
+            </div>
+
+            <div class="card">
+                <h3><span class="card-icon">📚</span>Mi Cuaderno Virtual</h3>
+                <p>Escribe, dibuja y guarda todo lo que aprendas. Tu espacio personal para crear y recordar.</p>
+                <button class="btn" onclick="showNotebook()">Abrir Cuaderno</button>
+            </div>
+
+            <div class="card">
+                <h3><span class="card-icon">📖</span>Cuentos Mágicos</h3>
+                <p>Escucha historias fantásticas que te transportarán a mundos increíbles llenos de aventuras.</p>
+                <button class="btn" onclick="showStories()">Escuchar Cuentos</button>
+            </div>
+
+            <div class="card">
+                <h3><span class="card-icon">🏆</span>Mis Logros</h3>
+                <p>Mira todos los premios que has ganado y tu progreso en el aprendizaje.</p>
+                <div class="achievements" id="achievementsDisplay">
+                    <p style="color: #666; font-style: italic;">¡Empieza a jugar y estudiar para ganar tus primeros logros!</p>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <p style="margin-top: 10px; color: #666;" id="progressText">¡Comienza tu aventura de aprendizaje!</p>
+            </div>
+
+            <div class="card">
+                <h3><span class="card-icon">💊</span>Recordatorios de Salud</h3>
+                <p>Te ayudo a recordar tus medicinas y citas médicas para que te sientas mejor pronto.</p>
+                <button class="btn" onclick="showReminders()">Ver Recordatorios</button>
+            </div>
+
+            <div class="card">
+                <h3><span class="card-icon">❤️</span>Relajación y Ánimo</h3>
+                <p>Ejercicios de respiración y palabras de ánimo para cuando te sientas triste o preocupado.</p>
+                <button class="btn" onclick="showRelaxation()">Relajarse</button>
+            </div>
+
+            <div class="card">
+                <h3><span class="card-icon">📝</span>Cuestionario</h3>
+                <form id="childQuestionnaire">
+                    <label for="childName">Nombre:</label>
+                    <input type="text" id="childName" name="childName" required><br><br>
+                    <label for="childAge">Edad:</label>
+                    <input type="number" id="childAge" name="childAge" required><br><br>
+                    <label for="educationLevel">Nivel Educativo:</label>
+                    <select id="educationLevel" name="educationLevel" required>
+                        <option value="">Selecciona...</option>
+                        <option value="primaria">Primaria</option>
+                        <option value="secundaria">Secundaria</option>
+                    </select><br><br>
+                    <button type="submit" class="btn">Enviar</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Game Area -->
+        <div class="game-area" id="gameArea">
+            <h2 style="text-align: center; color: #5a67d8; margin-bottom: 20px;">🎮 Centro de Juegos</h2>
+            
+            <div style="text-align: center; margin-bottom: 30px;">
+                <button class="btn" onclick="startMathGame()">Matemáticas Divertidas</button>
+                <button class="btn" onclick="startMemoryGame()">Juego de Memoria</button>
+                <button class="btn" onclick="hideGames()">Volver al Inicio</button>
+            </div>
+
+            <div id="mathGame" class="math-game hidden">
+                <h3>🔢 Matemáticas Divertidas</h3>
+                <div class="math-question" id="mathQuestion">5 + 3 = ?</div>
+                <input type="number" class="math-input" id="mathAnswer" placeholder="?">
+                <button class="btn" onclick="checkMathAnswer()">Comprobar</button>
+                <div id="mathResult" style="margin-top: 20px; font-size: 1.2rem;"></div>
+                <div style="margin-top: 20px;">
+                    <strong>Puntuación: <span id="mathScore">0</span></strong>
+                </div>
+            </div>
+
+            <div id="memoryGame" class="hidden">
+                <h3>🧠 Juego de Memoria</h3>
+                <p>Encuentra las parejas de emojis iguales</p>
+                <div class="memory-game" id="memoryBoard"></div>
+                <div style="margin-top: 20px; text-align: center;">
+                    <strong>Intentos: <span id="memoryAttempts">0</span></strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notebook Area -->
+        <div class="notebook" id="notebookArea">
+            <h2 style="text-align: center; color: #5a67d8; margin-bottom: 20px;">📚 Mi Cuaderno Virtual</h2>
+            
+            <div style="text-align: center; margin-bottom: 30px;">
+                <button class="btn" onclick="newNotePage()">Nueva Página</button>
+                <button class="btn" onclick="saveNote()">Guardar Nota</button>
+                <button class="btn" onclick="hideNotebook()">Volver al Inicio</button>
+            </div>
+
+            <div class="notebook-page">
+                <h3>✏️ Escribe aquí tus ideas</h3>
+                <textarea id="noteText" placeholder="Escribe lo que quieras recordar, tus ideas, o dibuja con palabras..."></textarea>
+                <div style="margin-top: 15px;">
+                    <input type="text" id="noteTitle" placeholder="Título de tu nota" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 10px;">
+                </div>
+            </div>
+
+            <div id="savedNotes" style="margin-top: 30px;">
+                <h3>📄 Mis Notas Guardadas</h3>
+                <div id="notesList"></div>
+            </div>
+        </div>
+
+        <!-- Stories Area -->
+        <div class="game-area" id="storiesArea">
+            <h2 style="text-align: center; color: #5a67d8; margin-bottom: 20px;">📖 Cuentos Mágicos</h2>
+            
+            <div style="text-align: center; margin-bottom: 30px;">
+                <button class="btn" onclick="readStory('dragon')">El Dragón Amigable</button>
+                <button class="btn" onclick="readStory('space')">Aventura Espacial</button>
+                <button class="btn" onclick="readStory('forest')">El Bosque Encantado</button>
+                <button class="btn" onclick="hideStories()">Volver al Inicio</button>
+            </div>
+
+            <div class="story-area">
+                <div class="story-text" id="storyText">
+                    Selecciona un cuento para comenzar la aventura...
+                </div>
+                <button class="btn hidden" id="nextStoryBtn" onclick="nextStoryPart()">Continuar Historia</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Bot -->
+    <div class="chat-container">
+        <div class="chat-bubble" onclick="toggleChat()"></div>
+        <div class="chat-window" id="chatWindow">
+            <div class="chat-header">
+                <div>🤖 AmigoBot</div>
+                <div style="font-size: 0.8rem; opacity: 0.8;">Tu amigo virtual</div>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    ¡Hola! Soy AmigoBot, tu amigo virtual. Estoy aquí para acompañarte, ayudarte con tus estudios y jugar contigo. ¿Cómo te sientes hoy?
+                </div>
+            </div>
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Escribe tu mensaje...">
+                <button class="chat-send" onclick="sendMessage()">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let mathScore = 0;
+        let currentMathAnswer = 0;
+        let memoryCards = [];
+        let flippedCards = [];
+        let memoryAttempts = 0;
+        let savedNotes = JSON.parse(localStorage.getItem('amigobot-notes') || '[]');
+        let currentStory = '';
+        let currentStoryPart = 0;
+        let achievements = JSON.parse(localStorage.getItem('amigobot-achievements') || '[]');
+        let totalProgress = 0;
+
+        // Stories data
+        const stories = {
+            dragon: [
+                "Había una vez un pequeño dragón llamado Fueguito que vivía en una montaña muy alta. A diferencia de otros dragones, Fueguito no sabía escupir fuego, lo que lo hacía sentir muy triste.",
+                "Un día, Fueguito decidió bajar de la montaña para buscar ayuda. En el pueblo, todos corrían asustados al verlo, pero una niña llamada Ana se acercó sin miedo.",
+                "'No tengas miedo', le dijo Ana. 'Veo que eres diferente a los otros dragones. ¿Qué te pasa?' Fueguito le contó su problema y Ana tuvo una idea genial.",
+                "'¿Sabías que no todos los dragones necesitan escupir fuego? Tú podrías ser un dragón de hielo y ayudar a los granjeros en el verano!' Y así, Fueguito descubrió que ser diferente lo hacía especial."
+            ],
+            space: [
+                "El pequeño astronauta Lucas estaba muy emocionado por su primer viaje espacial. Su nave espacial era pequeña pero muy rápida, perfecta para explorar planetas nuevos.",
+                "Su primera parada fue la Luna, donde encontró a unos simpáticos aliens que saltaban de cráter en cráter. '¡Hola!' dijeron los aliens. '¿Quieres jugar con nosotros?'",
+                "Lucas jugó con los aliens lunares y aprendió que en la Luna se puede saltar muy alto. Después visitó Marte, donde encontró plantas que brillaban en la oscuridad.",
+                "Al final de su aventura, Lucas regresó a la Tierra con muchas historias que contar y nuevos amigos en todo el universo. Había descubierto que el espacio estaba lleno de maravillas."
+            ],
+            forest: [
+                "En lo profundo del Bosque Encantado vivía una pequeña hada llamada Luz. Su trabajo era cuidar de todos los animales del bosque y mantener la magia del lugar.",
+                "Un día, Luz notó que las flores del bosque se estaban marchitando y los animales parecían tristes. Algo estaba mal con la magia del bosque.",
+                "Luz decidió investigar y descubrió que la Fuente de la Magia se había secado. Necesitaba encontrar la manera de devolverle el agua mágica.",
+                "Con la ayuda de sus amigos animales, Luz encontró una cascada secreta. Al tocarla con su varita, el agua volvió a fluir y el bosque recuperó toda su magia y belleza."
+            ]
+        };
+
+        // Chat responses
+        const botResponses = {
+            greeting: [
+                "¡Hola! Me alegra mucho verte. ¿Cómo te sientes hoy?",
+                "¡Qué bueno que estés aquí! Soy tu amigo AmigoBot. ¿En qué puedo ayudarte?",
+                "¡Hola, pequeño aventurero! ¿Quieres que juguemos o hablemos un poco?"
+            ],
+            sad: [
+                "Entiendo que te sientas triste. Estar en el hospital no es fácil, pero recuerda que eres muy valiente. ¿Quieres que te cuente un cuento o hagamos un ejercicio de respiración?",
+                "Es normal sentirse así a veces. Eres muy fuerte y pronto te sentirás mejor. ¿Te gustaría que juguemos algo divertido para animarte?",
+                "Cuando me siento triste, me gusta pensar en cosas bonitas. ¿Qué es lo que más te gusta hacer cuando estás feliz?"
+            ],
+            happy: [
+                "¡Qué alegría que te sientas bien! Tu sonrisa me hace muy feliz. ¿Quieres que aprendamos algo nuevo juntos?",
+                "¡Genial! Me encanta verte contento. ¿Qué te parece si jugamos un poco?",
+                "¡Esa es la actitud! Cuando estamos felices, todo es más fácil. ¿Quieres que hagamos algo divertido?"
+            ],
+            study: [
+                "¡Excelente! Me encanta que quieras aprender. ¿Qué materia te gustaría estudiar hoy? Podemos hacer matemáticas, lenguaje o lo que prefieras.",
+                "Estudiar es súper divertido cuando lo hacemos juntos. ¿Prefieres que empecemos con algo fácil o tienes alguna pregunta específica?",
+                "¡Qué genial! Aprender cosas nuevas es como descubrir tesoros. ¿Por dónde empezamos nuestra aventura de aprendizaje?"
+            ],
+            default: [
+                "¡Qué interesante! Cuéntame más sobre eso.",
+                "Me gusta mucho hablar contigo. ¿Hay algo especial que quieras hacer hoy?",
+                "Eres muy inteligente. ¿Te gustaría que juguemos, estudiemos o hablemos un poco más?",
+                "¡Siempre aprendo algo nuevo contigo! ¿Qué más te gustaría hacer?"
+            ]
+        };
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            displaySavedNotes();
+            displayAchievements();
+            updateProgress();
+            
+            // Set up chat input enter key
+            document.getElementById('chatInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        });
+
+        // Chat functions
+        function toggleChat() {
+            const chatWindow = document.getElementById('chatWindow');
+            const isVisible = chatWindow.style.display === 'flex';
+            chatWindow.style.display = isVisible ? 'none' : 'flex';
+            
+            if (!isVisible) {
+                document.getElementById('chatInput').focus();
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message === '') return;
+            
+            // Add user message
+            addMessage(message, 'user');
+            
+            // Clear input
+            input.value = '';
+            
+            // Generate bot response
+            setTimeout(() => {
+                const botResponse = generateBotResponse(message);
+                addMessage(botResponse, 'bot');
+            }, 1000);
+        }
+
+        function addMessage(text, sender) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            messageDiv.textContent = text;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function generateBotResponse(userMessage) {
+            const message = userMessage.toLowerCase();
+            
+            if (message.includes('hola') || message.includes('hi')) {
+                return getRandomResponse('greeting');
+            } else if (message.includes('triste') || message.includes('mal') || message.includes('dolor')) {
+                return getRandomResponse('sad');
+            } else if (message.includes('feliz') || message.includes('bien') || message.includes('genial')) {
+                return getRandomResponse('happy');
+            } else if (message.includes('estudiar') || message.includes('aprender') || message.includes('tarea')) {
+                return getRandomResponse('study');
+            } else if (message.includes('jugar') || message.includes('juego')) {
+                return "¡Perfecto! Tengo muchos juegos divertidos. Puedes cerrar el chat y hacer clic en 'Jugar Ahora' para empezar con matemáticas o memoria. ¡Será súper divertido!";
+            } else if (message.includes('cuento') || message.includes('historia')) {
+                return "¡Me encantan los cuentos! Tengo historias sobre dragones amigables, aventuras espaciales y bosques encantados. Ve a la sección de 'Cuentos Mágicos' para escucharlos.";
+            } else if (message.includes('gracias')) {
+                return "¡De nada! Para eso estoy aquí, para ser tu amigo y ayudarte. Siempre puedes contar conmigo.";
+            } else {
+                return getRandomResponse('default');
+            }
+        }
+
+        function getRandomResponse(type) {
+            const responses = botResponses[type];
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        // Game functions
+        function showGames() {
+            document.getElementById('gameArea').style.display = 'block';
+            document.querySelector('.main-content').style.display = 'none';
+        }
+
+        function hideGames() {
+            document.getElementById('gameArea').style.display = 'none';
+            document.querySelector('.main-content').style.display = 'grid';
+            
+            // Hide individual games
+            document.getElementById('mathGame').classList.add('hidden');
+            document.getElementById('memoryGame').classList.add('hidden');
+        }
+
+        function startMathGame() {
+            document.getElementById('mathGame').classList.remove('hidden');
+            document.getElementById('memoryGame').classList.add('hidden');
+            generateMathQuestion();
+        }
+
+        function generateMathQuestion() {
+            const num1 = Math.floor(Math.random() * 10) + 1;
+            const num2 = Math.floor(Math.random() * 10) + 1;
+            const operation = Math.random() > 0.5 ? '+' : '-';
+            
+            if (operation === '+') {
+                currentMathAnswer = num1 + num2;
+                document.getElementById('mathQuestion').textContent = `${num1} + ${num2} = ?`;
+            } else {
+                // Ensure positive result
+                const larger = Math.max(num1, num2);
+                const smaller = Math.min(num1, num2);
+                currentMathAnswer = larger - smaller;
+                document.getElementById('mathQuestion').textContent = `${larger} - ${smaller} = ?`;
+            }
+            
+            document.getElementById('mathAnswer').value = '';
+            document.getElementById('mathResult').textContent = '';
+        }
+
+        function checkMathAnswer() {
+            const userAnswer = parseInt(document.getElementById('mathAnswer').value);
+            const resultDiv = document.getElementById('mathResult');
+            
+            if (userAnswer === currentMathAnswer) {
+                mathScore += 10;
+                resultDiv.innerHTML = '🎉 ¡Correcto! ¡Eres genial!';
+                resultDiv.style.color = '#22c55e';
+                
+                // Check for first math achievement
+                if (mathScore === 10 && !hasAchievement('🌟 Primera Suma')) {
+                    unlockAchievement('🌟 Primera Suma');
+                }
+                
+                // Check for math master achievement
+                if (mathScore >= 100 && !hasAchievement('🧮 Maestro Matemático')) {
+                    unlockAchievement('🧮 Maestro Matemático');
+                }
+                
+                setTimeout(generateMathQuestion, 2000);
+            } else {
+                resultDiv.innerHTML = '💪 ¡Casi! Inténtalo de nuevo. La respuesta es ' + currentMathAnswer;
+                resultDiv.style.color = '#f59e0b';
+                setTimeout(generateMathQuestion, 3000);
+            }
+            
+            document.getElementById('mathScore').textContent = mathScore;
+        }
+
+        function startMemoryGame() {
+            document.getElementById('memoryGame').classList.remove('hidden');
+            document.getElementById('mathGame').classList.add('hidden');
+            initializeMemoryGame();
+        }
+
+        function initializeMemoryGame() {
+            const emojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'];
+            const gameEmojis = [...emojis, ...emojis];
+            memoryCards = gameEmojis.sort(() => Math.random() - 0.5);
+            flippedCards = [];
+            memoryAttempts = 0;
+            
+            const board = document.getElementById('memoryBoard');
+            board.innerHTML = '';
+            
+            memoryCards.forEach((emoji, index) => {
+                const card = document.createElement('button');
+                card.className = 'memory-card';
+                card.dataset.index = index;
+                card.dataset.emoji = emoji;
+                card.onclick = () => flipCard(index);
+                board.appendChild(card);
+            });
+            
+            document.getElementById('memoryAttempts').textContent = memoryAttempts;
+        }
+
+        function flipCard(index) {
+            const card = document.querySelector(`[data-index="${index}"]`);
+            
+            if (card.classList.contains('flipped') || flippedCards.length === 2) {
+                return;
+            }
+            
+            card.classList.add('flipped');
+            card.textContent = card.dataset.emoji;
+            flippedCards.push(index);
+            
+            if (flippedCards.length === 2) {
+                memoryAttempts++;
+                document.getElementById('memoryAttempts').textContent = memoryAttempts;
+                
+                setTimeout(checkMemoryMatch, 1000);
+            }
+        }
+
+        function checkMemoryMatch() {
+            const [first, second] = flippedCards;
+            const firstCard = document.querySelector(`[data-index="${first}"]`);
+            const secondCard = document.querySelector(`[data-index="${second}"]`);
+            
+            if (firstCard.dataset.emoji === secondCard.dataset.emoji) {
+                // Match found
+                firstCard.style.background = '#22c55e';
+                secondCard.style.background = '#22c55e';
+                
+                // Check if game is complete
+                if (document.querySelectorAll('.memory-card.flipped').length === memoryCards.length) {
+                    setTimeout(() => {
+                        alert('🎉 ¡Felicitaciones! ¡Completaste el juego de memoria!');
+                        
+                        // Check for memory achievement
+                        if (!hasAchievement('🎯 Memoria Perfecta')) {
+                            unlockAchievement('🎯 Memoria Perfecta');
+                        }
+                        
+                        // Check for speed achievement
+                        if (memoryAttempts <= 10 && !hasAchievement('⚡ Súper Velocidad')) {
+                            unlockAchievement('⚡ Súper Velocidad');
+                        }
+                    }, 500);
+                }
+            } else {
+                // No match
+                firstCard.classList.remove('flipped');
+                secondCard.classList.remove('flipped');
+                firstCard.textContent = '';
+                secondCard.textContent = '';
+            }
+            
+            flippedCards = [];
+        }
+
+        // Notebook functions
+        function showNotebook() {
+            document.getElementById('notebookArea').style.display = 'block';
+            document.querySelector('.main-content').style.display = 'none';
+        }
+
+        function hideNotebook() {
+            document.getElementById('notebookArea').style.display = 'none';
+            document.querySelector('.main-content').style.display = 'grid';
+        }
+
+        function newNotePage() {
+            document.getElementById('noteText').value = '';
+            document.getElementById('noteTitle').value = '';
+        }
+
+        function saveNote() {
+            const title = document.getElementById('noteTitle').value.trim();
+            const text = document.getElementById('noteText').value.trim();
+            
+            if (title === '' || text === '') {
+                alert('Por favor, escribe un título y contenido para tu nota.');
+                return;
+            }
+            
+            const note = {
+                id: Date.now(),
+                title: title,
+                content: text,
+                date: new Date().toLocaleDateString('es-ES')
+            };
+            
+            savedNotes.push(note);
+            localStorage.setItem('amigobot-notes', JSON.stringify(savedNotes));
+            
+            // Check for first note achievement
+            if (savedNotes.length === 1 && !hasAchievement('📝 Escritor Novato')) {
+                unlockAchievement('📝 Escritor Novato');
+            }
+            
+            // Check for prolific writer achievement
+            if (savedNotes.length >= 5 && !hasAchievement('📚 Escritor Prolífico')) {
+                unlockAchievement('📚 Escritor Prolífico');
+            }
+            
+            displaySavedNotes();
+            newNotePage();
+            
+            alert('¡Nota guardada correctamente! 📝');
+        }
+
+        function displaySavedNotes() {
+            const notesList = document.getElementById('notesList');
+            
+            if (savedNotes.length === 0) {
+                notesList.innerHTML = '<p style="color: #666; text-align: center;">Aún no tienes notas guardadas. ¡Escribe tu primera nota!</p>';
+                return;
+            }
+            
+            notesList.innerHTML = savedNotes.map(note => `
+                <div class="notebook-page" style="margin: 10px 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h4 style="color: #5a67d8; margin: 0;">${note.title}</h4>
+                        <div>
+                            <small style="color: #666;">${note.date}</small>
+                            <button onclick="deleteNote(${note.id})" style="margin-left: 10px; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">🗑️</button>
+                        </div>
+                    </div>
+                    <p style="line-height: 1.5;">${note.content}</p>
+                </div>
+            `).join('');
+        }
+
+        function deleteNote(noteId) {
+            if (confirm('¿Estás seguro de que quieres borrar esta nota?')) {
+                savedNotes = savedNotes.filter(note => note.id !== noteId);
+                localStorage.setItem('amigobot-notes', JSON.stringify(savedNotes));
+                displaySavedNotes();
+            }
+        }
+
+        // Stories functions
+        function showStories() {
+            document.getElementById('storiesArea').style.display = 'block';
+            document.querySelector('.main-content').style.display = 'none';
+        }
+
+        function hideStories() {
+            document.getElementById('storiesArea').style.display = 'none';
+            document.querySelector('.main-content').style.display = 'grid';
+        }
+
+        function readStory(storyType) {
+            currentStory = storyType;
+            currentStoryPart = 0;
+            
+            const storyText = document.getElementById('storyText');
+            const nextBtn = document.getElementById('nextStoryBtn');
+            
+            storyText.textContent = stories[storyType][currentStoryPart];
+            nextBtn.classList.remove('hidden');
+        }
+
+        function nextStoryPart() {
+            currentStoryPart++;
+            
+            if (currentStoryPart < stories[currentStory].length) {
+                document.getElementById('storyText').textContent = stories[currentStory][currentStoryPart];
+            } else {
+                document.getElementById('storyText').innerHTML = `
+                    <div style="text-align: center;">
+                        <h3>🎉 ¡Fin de la historia!</h3>
+                        <p>¿Te gustó esta aventura? Puedes elegir otra historia o hablar conmigo sobre lo que más te gustó.</p>
+                    </div>
+                `;
+                document.getElementById('nextStoryBtn').classList.add('hidden');
+                
+                // Check for first story achievement
+                if (!hasAchievement('📖 Amante de los Cuentos')) {
+                    unlockAchievement('📖 Amante de los Cuentos');
+                }
+            }
+        }
+
+        // Achievement system functions
+        function hasAchievement(achievementName) {
+            return achievements.some(achievement => achievement.name === achievementName);
+        }
+
+        function unlockAchievement(achievementName) {
+            if (!hasAchievement(achievementName)) {
+                const newAchievement = {
+                    name: achievementName,
+                    date: new Date().toLocaleDateString('es-ES')
+                };
+                
+                achievements.push(newAchievement);
+                localStorage.setItem('amigobot-achievements', JSON.stringify(achievements));
+                
+                displayAchievements();
+                updateProgress();
+                
+                // Show achievement notification
+                setTimeout(() => {
+                    alert(`🎉 ¡Nuevo logro desbloqueado!\n\n${achievementName}\n\n¡Felicitaciones! Sigue así de genial.`);
+                }, 500);
+            }
+        }
+
+        function displayAchievements() {
+            const achievementsDisplay = document.getElementById('achievementsDisplay');
+            
+            if (achievements.length === 0) {
+                achievementsDisplay.innerHTML = '<p style="color: #666; font-style: italic;">¡Empieza a jugar y estudiar para ganar tus primeros logros!</p>';
+                return;
+            }
+            
+            achievementsDisplay.innerHTML = achievements.map(achievement => `
+                <div class="achievement">${achievement.name}</div>
+            `).join('');
+        }
+
+        function updateProgress() {
+            const totalPossibleAchievements = 7; // Número total de logros disponibles
+            const currentAchievements = achievements.length;
+            const progressPercentage = (currentAchievements / totalPossibleAchievements) * 100;
+            
+            document.getElementById('progressFill').style.width = progressPercentage + '%';
+            
+            if (currentAchievements === 0) {
+                document.getElementById('progressText').textContent = '¡Comienza tu aventura de aprendizaje!';
+            } else if (currentAchievements === totalPossibleAchievements) {
+                document.getElementById('progressText').textContent = '🎉 ¡Completaste todos los logros! ¡Eres increíble!';
+            } else {
+                document.getElementById('progressText').textContent = `¡Vas genial! ${Math.round(progressPercentage)}% completado (${currentAchievements}/${totalPossibleAchievements} logros)`;
+            }
+        }
+
+        // Other functions
+        function showReminders() {
+            alert('💊 Recordatorios de Salud:\n\n• Medicina de la mañana: 9:00 AM\n• Ejercicios de respiración: 2:00 PM\n• Medicina de la tarde: 6:00 PM\n• Revisión médica: Mañana 10:00 AM\n\n¡Recuerda que cuidarte es súper importante!');
+        }
+
+        function showRelaxation() {
+            const relaxationWindow = window.open('', '_blank', 'width=500,height=400');
+            relaxationWindow.document.write(`
+                <html>
+                <head>
+                    <title>Relajación con AmigoBot</title>
+                    <style>
+                        body {
+                            font-family: 'Comic Sans MS', cursive;
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            color: white;
+                            text-align: center;
+                            padding: 50px;
+                            margin: 0;
+                        }
+                        .breathing-circle {
+                            width: 150px;
+                            height: 150px;
+                            border: 5px solid white;
+                            border-radius: 50%;
+                            margin: 30px auto;
+                            animation: breathe 4s infinite;
+                        }
+                        @keyframes breathe {
+                            0%, 100% { transform: scale(1); }
+                            50% { transform: scale(1.2); }
+                        }
+                        .instruction {
+                            font-size: 1.2rem;
+                            margin: 20px 0;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>🌸 Ejercicio de Relajación</h1>
+                    <div class="breathing-circle"></div>
+                    <div class="instruction">
+                        <p>Sigue el círculo con tu respiración:</p>
+                        <p><strong>Inhala</strong> cuando crezca</p>
+                        <p><strong>Exhala</strong> cuando se haga pequeño</p>
+                    </div>
+                    <p style="margin-top: 40px;">
+                        💝 Recuerda: Eres muy valiente y fuerte.<br>
+                        Todo va a estar bien. ¡Estoy aquí contigo!
+                    </p>
+                    <button onclick="window.close()" style="
+                        background: white;
+                        color: #667eea;
+                        border: none;
+                        padding: 15px 30px;
+                        border-radius: 25px;
+                        font-size: 1rem;
+                        font-weight: bold;
+                        cursor: pointer;
+                        margin-top: 30px;
+                    ">Cerrar</button>
+                </body>
+                </html>
+            `);
+        }
+    </script>
+</body>
+</html>
